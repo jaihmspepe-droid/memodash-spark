@@ -23,31 +23,31 @@ export const HeroSection = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 animate-fade-in">
             <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-semibold">Smart Learning Made Fun</span>
+            <span className="text-sm font-semibold">Apprendre devient un jeu</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-5xl md:text-7xl font-display font-black text-foreground mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Master Anything with{" "}
-            <span className="text-gradient">Smart Flashcards</span>
+            Maîtrisez tout avec des{" "}
+            <span className="text-gradient">Flashcards Intelligentes</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-10 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Create, share, and study with intelligent spaced repetition. 
-            Track your progress and achieve your learning goals.
+            Créez, partagez et révisez avec la répétition espacée. 
+            Suivez vos progrès et atteignez vos objectifs d'apprentissage.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-16 animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <Link to="/decks">
               <Button variant="hero" size="xl" className="gap-2">
-                Start Learning
+                Commencer à apprendre
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
             <Button variant="hero-outline" size="xl">
-              Try as Guest
+              Essayer en invité
             </Button>
           </div>
 
@@ -55,18 +55,18 @@ export const HeroSection = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <FeatureCard
               icon={Brain}
-              title="Spaced Repetition"
-              description="AI-powered scheduling for optimal memory retention"
+              title="Répétition Espacée"
+              description="Planification intelligente pour une mémorisation optimale"
             />
             <FeatureCard
               icon={Target}
-              title="Track Progress"
-              description="Detailed stats and streaks to keep you motivated"
+              title="Suivi des Progrès"
+              description="Statistiques détaillées et séries pour rester motivé"
             />
             <FeatureCard
               icon={Zap}
-              title="Instant Sync"
-              description="Access your decks anywhere, even offline"
+              title="Synchronisation"
+              description="Accédez à vos decks partout, même hors-ligne"
             />
           </div>
         </div>

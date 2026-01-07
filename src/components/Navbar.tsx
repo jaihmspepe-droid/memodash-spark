@@ -5,8 +5,8 @@ import { Home, LayoutGrid, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: "/", label: "Home", icon: Home },
-  { path: "/decks", label: "My Decks", icon: LayoutGrid },
+  { path: "/", label: "Accueil", icon: Home },
+  { path: "/decks", label: "Mes Decks", icon: LayoutGrid },
 ];
 
 export const Navbar = () => {
@@ -42,7 +42,7 @@ export const Navbar = () => {
           </Button>
           <Button variant="hero" className="gap-2">
             <User className="w-4 h-4" />
-            Sign In
+            Connexion
           </Button>
         </div>
       </div>

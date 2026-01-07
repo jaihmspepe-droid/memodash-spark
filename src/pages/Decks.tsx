@@ -6,11 +6,11 @@ import { Plus, Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 
-// Sample user decks
+// Decks utilisateur de démonstration
 const userDecks = [
   {
     id: "1",
-    title: "French Vocabulary",
+    title: "Vocabulaire Anglais",
     cardCount: 150,
     categoryCount: 5,
     color: "hsl(280 70% 50%)",
@@ -18,7 +18,7 @@ const userDecks = [
   },
   {
     id: "2",
-    title: "Biology Basics",
+    title: "Bases de Biologie",
     cardCount: 89,
     categoryCount: 3,
     color: "hsl(142 70% 45%)",
@@ -27,7 +27,7 @@ const userDecks = [
   },
   {
     id: "3",
-    title: "JavaScript Essentials",
+    title: "Essentiels JavaScript",
     cardCount: 200,
     categoryCount: 8,
     color: "hsl(45 95% 55%)",
@@ -35,7 +35,7 @@ const userDecks = [
   },
   {
     id: "4",
-    title: "World History",
+    title: "Histoire du Monde",
     cardCount: 120,
     categoryCount: 6,
     color: "hsl(15 85% 55%)",
@@ -43,7 +43,7 @@ const userDecks = [
   },
   {
     id: "5",
-    title: "Medical Terminology",
+    title: "Terminologie Médicale",
     cardCount: 300,
     categoryCount: 12,
     color: "hsl(200 80% 50%)",
@@ -65,29 +65,29 @@ const Decks = () => {
       <Navbar />
 
       <main className="container py-8">
-        {/* Header */}
+        {/* En-tête */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-              My Decks
+              Mes Decks
             </h1>
             <p className="text-muted-foreground">
-              {userDecks.length} decks • {userDecks.reduce((acc, d) => acc + d.cardCount, 0)} total cards
+              {userDecks.length} decks • {userDecks.reduce((acc, d) => acc + d.cardCount, 0)} cartes au total
             </p>
           </div>
 
           <Button variant="hero" size="lg" className="gap-2">
             <Plus className="w-5 h-5" />
-            Create Deck
+            Créer un Deck
           </Button>
         </div>
 
-        {/* Search and filters */}
+        {/* Recherche et filtres */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Search decks..."
+              placeholder="Rechercher des decks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-12 rounded-xl"
@@ -95,11 +95,11 @@ const Decks = () => {
           </div>
           <Button variant="outline" size="lg" className="gap-2">
             <SlidersHorizontal className="w-4 h-4" />
-            Filters
+            Filtres
           </Button>
         </div>
 
-        {/* Decks grid */}
+        {/* Grille de decks */}
         {filteredDecks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDecks.map((deck) => (
@@ -112,7 +112,7 @@ const Decks = () => {
                 progress={deck.progress}
                 isShared={deck.isShared}
                 onPlay={() => navigate(`/study/${deck.id}`)}
-                onClick={() => console.log("View deck", deck.id)}
+                onClick={() => console.log("Voir deck", deck.id)}
               />
             ))}
           </div>
@@ -121,13 +121,13 @@ const Decks = () => {
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">No decks found</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Aucun deck trouvé</h3>
             <p className="text-muted-foreground mb-6">
-              Try adjusting your search or create a new deck
+              Essayez d'ajuster votre recherche ou créez un nouveau deck
             </p>
             <Button variant="hero" className="gap-2">
               <Plus className="w-5 h-5" />
-              Create Your First Deck
+              Créer votre premier Deck
             </Button>
           </div>
         )}
