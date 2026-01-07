@@ -17,7 +17,7 @@ export const DeckCard = ({
   title,
   cardCount,
   categoryCount,
-  color = "hsl(187 85% 43%)",
+  color = "hsl(0 75% 50%)",
   isShared = false,
   progress = 0,
   onPlay,
@@ -51,7 +51,7 @@ export const DeckCard = ({
               {title}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {cardCount} cards • {categoryCount} categories
+              {cardCount} cartes • {categoryCount} catégories
             </p>
           </div>
         </div>
@@ -65,7 +65,7 @@ export const DeckCard = ({
       {/* Progress bar */}
       <div className="mb-4">
         <div className="flex justify-between text-xs text-muted-foreground mb-1">
-          <span>Progress</span>
+          <span>Progression</span>
           <span>{progress}%</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -90,7 +90,7 @@ export const DeckCard = ({
         }}
       >
         <Play className="w-5 h-5" />
-        Study Now
+        Réviser
       </Button>
     </div>
   );

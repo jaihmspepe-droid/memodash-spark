@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Share2, Wifi } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Sample decks for demonstration
+// Decks de démonstration
 const sampleDecks = [
   {
     id: "1",
-    title: "French Vocabulary",
+    title: "Vocabulaire Français",
     cardCount: 150,
     categoryCount: 5,
     color: "hsl(280 70% 50%)",
@@ -17,7 +17,7 @@ const sampleDecks = [
   },
   {
     id: "2",
-    title: "Biology Basics",
+    title: "Bases de Biologie",
     cardCount: 89,
     categoryCount: 3,
     color: "hsl(142 70% 45%)",
@@ -26,7 +26,7 @@ const sampleDecks = [
   },
   {
     id: "3",
-    title: "JavaScript Essentials",
+    title: "Essentiels JavaScript",
     cardCount: 200,
     categoryCount: 8,
     color: "hsl(45 95% 55%)",
@@ -40,21 +40,21 @@ const Index = () => {
       <Navbar />
       <HeroSection />
 
-      {/* Featured Decks Section */}
+      {/* Section Decks Populaires */}
       <section className="py-20 bg-muted/30">
         <div className="container">
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-                Popular Decks
+                Decks Populaires
               </h2>
               <p className="text-muted-foreground">
-                Explore community-created flashcard decks
+                Explorez les decks créés par la communauté
               </p>
             </div>
             <Link to="/decks">
               <Button variant="outline" className="gap-2">
-                View All
+                Voir tout
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -70,23 +70,23 @@ const Index = () => {
                 color={deck.color}
                 progress={deck.progress}
                 isShared={deck.isShared}
-                onPlay={() => console.log("Play", deck.id)}
-                onClick={() => console.log("View", deck.id)}
+                onPlay={() => console.log("Jouer", deck.id)}
+                onClick={() => console.log("Voir", deck.id)}
               />
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Section Comment ça marche */}
       <section className="py-20">
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
-              How MemoDeck Works
+              Comment fonctionne MemoDeck
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Three simple steps to supercharge your learning
+              Trois étapes simples pour booster votre apprentissage
             </p>
           </div>
 
@@ -94,40 +94,40 @@ const Index = () => {
             <StepCard
               number={1}
               icon={BookOpen}
-              title="Create Your Deck"
-              description="Build custom flashcard decks with unlimited categories and subcategories"
+              title="Créez votre Deck"
+              description="Construisez des decks personnalisés avec des catégories et sous-catégories illimitées"
             />
             <StepCard
               number={2}
               icon={Share2}
-              title="Study & Share"
-              description="Use spaced repetition to learn efficiently and share decks with friends"
+              title="Révisez & Partagez"
+              description="Utilisez la répétition espacée pour apprendre efficacement et partagez avec vos amis"
             />
             <StepCard
               number={3}
               icon={Wifi}
-              title="Learn Anywhere"
-              description="Download decks for offline study and sync progress across devices"
+              title="Apprenez Partout"
+              description="Téléchargez vos decks pour réviser hors-ligne et synchronisez vos progrès"
             />
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Section CTA */}
       <section className="py-20 gradient-primary">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-primary-foreground mb-4">
-            Ready to Boost Your Learning?
+            Prêt à booster votre apprentissage ?
           </h2>
           <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join thousands of learners using MemoDeck to master new skills every day.
+            Rejoignez des milliers d'apprenants qui utilisent MemoDeck pour maîtriser de nouvelles compétences.
           </p>
           <Link to="/decks">
             <Button
               size="xl"
               className="bg-background text-primary hover:bg-background/90 font-bold gap-2"
             >
-              Get Started Free
+              Commencer gratuitement
               <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>
@@ -139,14 +139,14 @@ const Index = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2026 MemoDeck. All rights reserved.
+              © 2026 MemoDeck. Tous droits réservés.
             </p>
             <div className="flex items-center gap-6">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Privacy Policy
+                Politique de confidentialité
               </a>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Terms of Service
+                Conditions d'utilisation
               </a>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Contact

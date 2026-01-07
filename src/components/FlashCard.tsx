@@ -15,7 +15,7 @@ export const FlashCard = ({
   question,
   answer,
   difficulty = 3,
-  categoryColor = "hsl(187 85% 43%)",
+  categoryColor = "hsl(0 75% 50%)",
   isFlipped = false,
   onFlip,
 }: FlashCardProps) => {
@@ -61,7 +61,7 @@ export const FlashCard = ({
           </div>
           
           <p className="text-sm text-muted-foreground text-center mt-4">
-            Tap to reveal answer
+            Appuyez pour révéler la réponse
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export const FlashCard = ({
           </div>
           
           <p className="text-sm text-muted-foreground text-center mt-4">
-            Tap to see question
+            Appuyez pour voir la question
           </p>
         </div>
       </div>

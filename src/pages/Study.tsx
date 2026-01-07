@@ -7,16 +7,16 @@ import { Logo } from "@/components/Logo";
 import { ArrowLeft, Check, X, RotateCcw, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Sample flashcards
+// Flashcards de démonstration
 const sampleCards = [
-  { id: "1", question: "What is the capital of France?", answer: "Paris", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
-  { id: "2", question: "What is 'Hello' in French?", answer: "Bonjour", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "3", question: "What is 'Goodbye' in French?", answer: "Au revoir", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
-  { id: "4", question: "What is the French word for 'cat'?", answer: "Chat", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "5", question: "What is the French word for 'dog'?", answer: "Chien", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "6", question: "How do you say 'Thank you' in French?", answer: "Merci", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "7", question: "What is the French word for 'book'?", answer: "Livre", difficulty: 3, categoryColor: "hsl(280 70% 50%)" },
-  { id: "8", question: "How do you count to 3 in French?", answer: "Un, Deux, Trois", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
+  { id: "1", question: "Quelle est la capitale de la France ?", answer: "Paris", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
+  { id: "2", question: "Comment dit-on 'Bonjour' en anglais ?", answer: "Hello", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
+  { id: "3", question: "Comment dit-on 'Au revoir' en anglais ?", answer: "Goodbye", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
+  { id: "4", question: "Quel est le mot anglais pour 'chat' ?", answer: "Cat", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
+  { id: "5", question: "Quel est le mot anglais pour 'chien' ?", answer: "Dog", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
+  { id: "6", question: "Comment dit-on 'Merci' en anglais ?", answer: "Thank you", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
+  { id: "7", question: "Quel est le mot anglais pour 'livre' ?", answer: "Book", difficulty: 3, categoryColor: "hsl(280 70% 50%)" },
+  { id: "8", question: "Comptez jusqu'à 3 en anglais", answer: "One, Two, Three", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
 ];
 
 const Study = () => {
@@ -54,7 +54,7 @@ const Study = () => {
       setIncorrect((prev) => prev + 1);
     }
 
-    // Move to next card
+    // Passer à la carte suivante
     setTimeout(() => {
       setIsFlipped(false);
       if (currentIndex < sampleCards.length - 1) {
@@ -88,11 +88,11 @@ const Study = () => {
             onClick={() => navigate("/decks")}
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Decks
+            Retour aux Decks
           </Button>
         </header>
 
-        {/* Results */}
+        {/* Résultats */}
         <main className="flex-1 flex items-center justify-center p-4">
           <div className="bg-card rounded-3xl p-8 md:p-12 shadow-lg max-w-md w-full text-center animate-scale-in">
             <div className="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
@@ -100,21 +100,21 @@ const Study = () => {
             </div>
 
             <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-              Session Complete!
+              Session terminée !
             </h1>
             <p className="text-muted-foreground mb-8">
-              Great job finishing this study session
+              Excellent travail pour cette session de révision
             </p>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="bg-muted rounded-xl p-4">
                 <p className="text-3xl font-display font-bold text-foreground">{score}</p>
-                <p className="text-sm text-muted-foreground">Total Score</p>
+                <p className="text-sm text-muted-foreground">Score total</p>
               </div>
               <div className="bg-muted rounded-xl p-4">
                 <p className="text-3xl font-display font-bold text-foreground">{percentage}%</p>
-                <p className="text-sm text-muted-foreground">Accuracy</p>
+                <p className="text-sm text-muted-foreground">Précision</p>
               </div>
               <div className="bg-success/10 rounded-xl p-4">
                 <p className="text-3xl font-display font-bold text-success">{correct}</p>
@@ -130,10 +130,10 @@ const Study = () => {
             <div className="flex flex-col gap-3">
               <Button variant="hero" size="lg" className="w-full gap-2" onClick={handleRestart}>
                 <RotateCcw className="w-5 h-5" />
-                Study Again
+                Réviser à nouveau
               </Button>
               <Button variant="outline" size="lg" className="w-full" onClick={() => navigate("/decks")}>
-                Back to Decks
+                Retour aux Decks
               </Button>
             </div>
           </div>
@@ -152,7 +152,7 @@ const Study = () => {
           onClick={() => navigate("/decks")}
         >
           <ArrowLeft className="w-4 h-4" />
-          Exit
+          Quitter
         </Button>
 
         <Logo size="sm" />
@@ -162,7 +162,7 @@ const Study = () => {
         </div>
       </header>
 
-      {/* Progress bar */}
+      {/* Barre de progression */}
       <div className="container mb-4">
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
@@ -172,7 +172,7 @@ const Study = () => {
         </div>
       </div>
 
-      {/* Score display */}
+      {/* Affichage du score */}
       <div className="container flex justify-center mb-8">
         <ScoreDisplay
           score={score}
@@ -195,7 +195,7 @@ const Study = () => {
           />
         </div>
 
-        {/* Answer buttons */}
+        {/* Boutons de réponse */}
         <div className="flex gap-4 w-full max-w-lg">
           <Button
             variant="dont-know"
@@ -204,7 +204,7 @@ const Study = () => {
             onClick={() => handleAnswer(false)}
           >
             <X className="w-6 h-6" />
-            {isFlipped ? "Didn't Know" : "Reveal"}
+            {isFlipped ? "Je ne savais pas" : "Révéler"}
           </Button>
           <Button
             variant="know"
@@ -217,7 +217,7 @@ const Study = () => {
             disabled={!isFlipped}
           >
             <Check className="w-6 h-6" />
-            I Knew It
+            Je savais
           </Button>
         </div>
       </main>
