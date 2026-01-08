@@ -40,15 +40,17 @@ export const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-16 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <Link to="/decks">
+            <Link to="/auth">
               <Button variant="hero" size="xl" className="gap-2">
                 Commencer à apprendre
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Button variant="hero-outline" size="xl">
-              Essayer en invité
-            </Button>
+            <Link to="/decks">
+              <Button variant="hero-outline" size="xl">
+                Essayer en invité
+              </Button>
+            </Link>
           </div>
 
           {/* Feature highlights */}

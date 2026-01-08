@@ -3,6 +3,7 @@ import logoImage from "@/assets/memodeck-logo.png";
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   showText?: boolean;
+  onClick?: () => void;
 }
 
 const sizeMap = {
@@ -12,9 +13,9 @@ const sizeMap = {
   xl: "h-24",
 };
 
-export const Logo = ({ size = "md", showText = false }: LogoProps) => {
+export const Logo = ({ size = "md", showText = false, onClick }: LogoProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 cursor-pointer" onClick={onClick}>
       <img 
         src={logoImage} 
         alt="MemoDeck" 
