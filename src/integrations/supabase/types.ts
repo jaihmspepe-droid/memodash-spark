@@ -14,7 +14,251 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          deck_id: string
+          id: string
+          name: string
+          parent_id: string | null
+          position: number | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          deck_id: string
+          id?: string
+          name: string
+          parent_id?: string | null
+          position?: number | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          deck_id?: string
+          id?: string
+          name?: string
+          parent_id?: string | null
+          position?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decks: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_offline_available: boolean | null
+          share_code: string | null
+          share_permission: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_offline_available?: boolean | null
+          share_code?: string | null
+          share_permission?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_offline_available?: boolean | null
+          share_code?: string | null
+          share_permission?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flashcards: {
+        Row: {
+          answer: string
+          answer_image_url: string | null
+          background_image_url: string | null
+          card_type: string | null
+          category_id: string | null
+          created_at: string
+          deck_id: string
+          difficulty: number | null
+          ease_factor: number | null
+          id: string
+          interval_days: number | null
+          next_review_at: string | null
+          position: number | null
+          priority: number | null
+          question: string
+          question_image_url: string | null
+          review_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          answer_image_url?: string | null
+          background_image_url?: string | null
+          card_type?: string | null
+          category_id?: string | null
+          created_at?: string
+          deck_id: string
+          difficulty?: number | null
+          ease_factor?: number | null
+          id?: string
+          interval_days?: number | null
+          next_review_at?: string | null
+          position?: number | null
+          priority?: number | null
+          question: string
+          question_image_url?: string | null
+          review_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          answer_image_url?: string | null
+          background_image_url?: string | null
+          card_type?: string | null
+          category_id?: string | null
+          created_at?: string
+          deck_id?: string
+          difficulty?: number | null
+          ease_factor?: number | null
+          id?: string
+          interval_days?: number | null
+          next_review_at?: string | null
+          position?: number | null
+          priority?: number | null
+          question?: string
+          question_image_url?: string | null
+          review_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcards_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          dark_mode: boolean | null
+          display_name: string | null
+          id: string
+          primary_color: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          dark_mode?: boolean | null
+          display_name?: string | null
+          id?: string
+          primary_color?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          dark_mode?: boolean | null
+          display_name?: string | null
+          id?: string
+          primary_color?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_sessions: {
+        Row: {
+          completed_at: string | null
+          correct_count: number | null
+          created_at: string
+          deck_id: string
+          duration_seconds: number | null
+          id: string
+          incorrect_count: number | null
+          max_streak: number | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          correct_count?: number | null
+          created_at?: string
+          deck_id: string
+          duration_seconds?: number | null
+          id?: string
+          incorrect_count?: number | null
+          max_streak?: number | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          correct_count?: number | null
+          created_at?: string
+          deck_id?: string
+          duration_seconds?: number | null
+          id?: string
+          incorrect_count?: number | null
+          max_streak?: number | null
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

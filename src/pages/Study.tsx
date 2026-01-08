@@ -1,42 +1,67 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FlashCard } from "@/components/FlashCard";
 import { ScoreDisplay } from "@/components/ScoreDisplay";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import { ArrowLeft, Check, X, RotateCcw, Trophy } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw, Trophy, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Flashcards de démonstration
-const sampleCards = [
-  { id: "1", question: "Quelle est la capitale de la France ?", answer: "Paris", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
-  { id: "2", question: "Comment dit-on 'Bonjour' en anglais ?", answer: "Hello", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "3", question: "Comment dit-on 'Au revoir' en anglais ?", answer: "Goodbye", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
-  { id: "4", question: "Quel est le mot anglais pour 'chat' ?", answer: "Cat", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "5", question: "Quel est le mot anglais pour 'chien' ?", answer: "Dog", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "6", question: "Comment dit-on 'Merci' en anglais ?", answer: "Thank you", difficulty: 1, categoryColor: "hsl(280 70% 50%)" },
-  { id: "7", question: "Quel est le mot anglais pour 'livre' ?", answer: "Book", difficulty: 3, categoryColor: "hsl(280 70% 50%)" },
-  { id: "8", question: "Comptez jusqu'à 3 en anglais", answer: "One, Two, Three", difficulty: 2, categoryColor: "hsl(280 70% 50%)" },
-];
+import { useFlashcards } from "@/hooks/useDecks";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Study = () => {
   const { deckId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { flashcards, loading, updateSpacedRepetition } = useFlashcards(deckId);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [incorrect, setIncorrect] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [answeredCards, setAnsweredCards] = useState<Set<string>>(new Set());
+  const [startTime] = useState(new Date());
 
-  const currentCard = sampleCards[currentIndex];
-  const isComplete = answeredCards.size === sampleCards.length;
+  const currentCard = flashcards[currentIndex];
+  const isComplete = flashcards.length > 0 && answeredCards.size === flashcards.length;
   const multiplier = Math.min(Math.floor(streak / 3) + 1, 5);
 
-  const handleAnswer = useCallback((knew: boolean) => {
+  // Track max streak
+  useEffect(() => {
+    if (streak > maxStreak) {
+      setMaxStreak(streak);
+    }
+  }, [streak, maxStreak]);
+
+  const saveSession = async () => {
+    if (!user || !deckId) return;
+
+    const duration = Math.round((new Date().getTime() - startTime.getTime()) / 1000);
+
+    try {
+      await supabase.from('study_sessions').insert({
+        user_id: user.id,
+        deck_id: deckId,
+        score,
+        correct_count: correct,
+        incorrect_count: incorrect,
+        max_streak: maxStreak,
+        duration_seconds: duration,
+        completed_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error saving session:', error);
+    }
+  };
+
+  const handleAnswer = useCallback(async (knew: boolean) => {
+    if (!currentCard) return;
+
     if (!isFlipped) {
       setIsFlipped(true);
       return;
@@ -54,30 +79,79 @@ const Study = () => {
       setIncorrect((prev) => prev + 1);
     }
 
+    // Update spaced repetition
+    if (user) {
+      await updateSpacedRepetition(currentCard.id, knew);
+    }
+
     // Passer à la carte suivante
     setTimeout(() => {
       setIsFlipped(false);
-      if (currentIndex < sampleCards.length - 1) {
+      if (currentIndex < flashcards.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       } else {
         setShowResult(true);
+        saveSession();
       }
     }, 300);
-  }, [isFlipped, currentCard, currentIndex, multiplier]);
+  }, [isFlipped, currentCard, currentIndex, multiplier, flashcards.length, updateSpacedRepetition, user]);
 
   const handleRestart = () => {
     setCurrentIndex(0);
     setIsFlipped(false);
     setScore(0);
     setStreak(0);
+    setMaxStreak(0);
     setCorrect(0);
     setIncorrect(0);
     setShowResult(false);
     setAnsweredCards(new Set());
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background gradient-hero flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (flashcards.length === 0) {
+    return (
+      <div className="min-h-screen bg-background gradient-hero flex flex-col">
+        <header className="container py-4">
+          <Button
+            variant="ghost"
+            className="gap-2"
+            onClick={() => navigate("/decks")}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour aux Decks
+          </Button>
+        </header>
+
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="bg-card rounded-3xl p-8 md:p-12 shadow-lg max-w-md w-full text-center">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-10 h-10 text-muted-foreground" />
+            </div>
+            <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+              Aucune carte dans ce deck
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Ajoutez des flashcards à ce deck pour commencer à réviser
+            </p>
+            <Button variant="hero" onClick={() => navigate("/decks")}>
+              Retour aux Decks
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (showResult || isComplete) {
-    const percentage = Math.round((correct / sampleCards.length) * 100);
+    const percentage = Math.round((correct / flashcards.length) * 100);
     return (
       <div className="min-h-screen bg-background gradient-hero flex flex-col">
         {/* Header */}
@@ -158,7 +232,7 @@ const Study = () => {
         <Logo size="sm" />
 
         <div className="text-sm text-muted-foreground">
-          {currentIndex + 1} / {sampleCards.length}
+          {currentIndex + 1} / {flashcards.length}
         </div>
       </header>
 
@@ -167,7 +241,7 @@ const Study = () => {
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full gradient-primary transition-all duration-500"
-            style={{ width: `${((currentIndex + 1) / sampleCards.length) * 100}%` }}
+            style={{ width: `${((currentIndex + 1) / flashcards.length) * 100}%` }}
           />
         </div>
       </div>
@@ -189,7 +263,7 @@ const Study = () => {
             question={currentCard.question}
             answer={currentCard.answer}
             difficulty={currentCard.difficulty}
-            categoryColor={currentCard.categoryColor}
+            categoryColor={currentCard.categoryColor || 'hsl(0 75% 50%)'}
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
           />
