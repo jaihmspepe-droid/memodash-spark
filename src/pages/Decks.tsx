@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { DeckCard } from "@/components/DeckCard";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, SlidersHorizontal, Loader2, LogIn } from "lucide-react";
+import { Plus, Search, Loader2, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate, Link } from "react-router-dom";
 import { useDecks } from "@/hooks/useDecks";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { ImportDeckDialog } from "@/components/ImportDeckDialog";
 
 const colorOptions = [
   "hsl(0 75% 50%)",
@@ -25,20 +33,44 @@ const colorOptions = [
   "hsl(320 70% 50%)",
 ];
 
+type SortOption = "recent" | "cards" | "progress" | "name";
+
 const Decks = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newDeckTitle, setNewDeckTitle] = useState("");
   const [newDeckColor, setNewDeckColor] = useState(colorOptions[0]);
   const [isCreating, setIsCreating] = useState(false);
   
   const navigate = useNavigate();
-  const { decks, loading, createDeck } = useDecks();
+  const { decks, loading, createDeck, fetchDecks } = useDecks();
   const { user, loading: authLoading } = useAuth();
 
-  const filteredDecks = decks.filter((deck) =>
-    deck.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAndSortedDecks = useMemo(() => {
+    let result = decks.filter((deck) =>
+      deck.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    switch (sortBy) {
+      case "recent":
+        result.sort(
+          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+        break;
+      case "cards":
+        result.sort((a, b) => (b.cardCount || 0) - (a.cardCount || 0));
+        break;
+      case "progress":
+        result.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+        break;
+      case "name":
+        result.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+    }
+
+    return result;
+  }, [decks, searchQuery, sortBy]);
 
   const handleCreateDeck = async () => {
     if (!newDeckTitle.trim()) return;
@@ -112,61 +144,65 @@ const Decks = () => {
             </p>
           </div>
 
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="hero" size="lg" className="gap-2">
-                <Plus className="w-5 h-5" />
-                Créer un Deck
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Créer un nouveau Deck</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="deckTitle">Nom du deck</Label>
-                  <Input
-                    id="deckTitle"
-                    placeholder="Ex: Vocabulaire Anglais"
-                    value={newDeckTitle}
-                    onChange={(e) => setNewDeckTitle(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateDeck()}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Couleur</Label>
-                  <div className="flex gap-2">
-                    {colorOptions.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => setNewDeckColor(color)}
-                        className={`w-8 h-8 rounded-full transition-transform ${
-                          newDeckColor === color ? 'scale-125 ring-2 ring-offset-2 ring-primary' : ''
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <Button
-                  variant="hero"
-                  className="w-full"
-                  onClick={handleCreateDeck}
-                  disabled={!newDeckTitle.trim() || isCreating}
-                >
-                  {isCreating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Création...
-                    </>
-                  ) : (
-                    'Créer le Deck'
-                  )}
+          <div className="flex gap-2">
+            <ImportDeckDialog onImport={fetchDecks} />
+            
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="hero" size="lg" className="gap-2">
+                  <Plus className="w-5 h-5" />
+                  Créer un Deck
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Créer un nouveau Deck</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="deckTitle">Nom du deck</Label>
+                    <Input
+                      id="deckTitle"
+                      placeholder="Ex: Vocabulaire Anglais"
+                      value={newDeckTitle}
+                      onChange={(e) => setNewDeckTitle(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCreateDeck()}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Couleur</Label>
+                    <div className="flex gap-2">
+                      {colorOptions.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setNewDeckColor(color)}
+                          className={`w-8 h-8 rounded-full transition-transform ${
+                            newDeckColor === color ? 'scale-125 ring-2 ring-offset-2 ring-primary' : ''
+                          }`}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <Button
+                    variant="hero"
+                    className="w-full"
+                    onClick={handleCreateDeck}
+                    disabled={!newDeckTitle.trim() || isCreating}
+                  >
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Création...
+                      </>
+                    ) : (
+                      'Créer le Deck'
+                    )}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Recherche et filtres */}
@@ -181,17 +217,27 @@ const Decks = () => {
                 className="pl-10 h-12 rounded-xl"
               />
             </div>
-            <Button variant="outline" size="lg" className="gap-2">
-              <SlidersHorizontal className="w-4 h-4" />
-              Filtres
-            </Button>
+            <Select
+              value={sortBy}
+              onValueChange={(value) => setSortBy(value as SortOption)}
+            >
+              <SelectTrigger className="w-48 h-12">
+                <SelectValue placeholder="Trier par" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Plus récents</SelectItem>
+                <SelectItem value="cards">Plus de cartes</SelectItem>
+                <SelectItem value="progress">Progression</SelectItem>
+                <SelectItem value="name">Nom (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         )}
 
         {/* Grille de decks */}
-        {filteredDecks.length > 0 ? (
+        {filteredAndSortedDecks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDecks.map((deck) => (
+            {filteredAndSortedDecks.map((deck) => (
               <DeckCard
                 key={deck.id}
                 title={deck.title}
