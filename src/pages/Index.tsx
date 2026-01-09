@@ -1,40 +1,79 @@
+import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { DeckCard } from "@/components/DeckCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, Share2, Wifi } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowRight, BookOpen, Share2, Wifi, SlidersHorizontal } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDecks } from "@/hooks/useDecks";
+import { useAuth } from "@/hooks/useAuth";
 
-// Decks de démonstration
-const sampleDecks = [
-  {
-    id: "1",
-    title: "Vocabulaire Français",
-    cardCount: 150,
-    categoryCount: 5,
-    color: "hsl(280 70% 50%)",
-    progress: 65,
-  },
-  {
-    id: "2",
-    title: "Bases de Biologie",
-    cardCount: 89,
-    categoryCount: 3,
-    color: "hsl(142 70% 45%)",
-    progress: 40,
-    isShared: true,
-  },
-  {
-    id: "3",
-    title: "Essentiels JavaScript",
-    cardCount: 200,
-    categoryCount: 8,
-    color: "hsl(45 95% 55%)",
-    progress: 88,
-  },
-];
+type SortOption = "recent" | "cards" | "progress" | "name";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { decks, loading } = useDecks();
+  const [sortBy, setSortBy] = useState<SortOption>("recent");
+
+  const sortedDecks = useMemo(() => {
+    if (!decks || decks.length === 0) return [];
+
+    const sorted = [...decks];
+    switch (sortBy) {
+      case "recent":
+        return sorted.sort(
+          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+      case "cards":
+        return sorted.sort((a, b) => (b.cardCount || 0) - (a.cardCount || 0));
+      case "progress":
+        return sorted.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+      case "name":
+        return sorted.sort((a, b) => a.title.localeCompare(b.title));
+      default:
+        return sorted;
+    }
+  }, [decks, sortBy]);
+
+  // Show user's most used decks or demo decks
+  const displayDecks = user && sortedDecks.length > 0
+    ? sortedDecks.slice(0, 3)
+    : [
+        {
+          id: "demo-1",
+          title: "Vocabulaire Français",
+          cardCount: 150,
+          categoryCount: 5,
+          color: "hsl(280 70% 50%)",
+          progress: 65,
+        },
+        {
+          id: "demo-2",
+          title: "Bases de Biologie",
+          cardCount: 89,
+          categoryCount: 3,
+          color: "hsl(142 70% 45%)",
+          progress: 40,
+          isShared: true,
+        },
+        {
+          id: "demo-3",
+          title: "Essentiels JavaScript",
+          cardCount: 200,
+          categoryCount: 8,
+          color: "hsl(45 95% 55%)",
+          progress: 88,
+        },
+      ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -43,35 +82,60 @@ const Index = () => {
       {/* Section Decks Populaires */}
       <section className="py-20 bg-muted/30">
         <div className="container">
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
             <div>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-                Decks Populaires
+                {user ? "Vos Decks les plus utilisés" : "Decks Populaires"}
               </h2>
               <p className="text-muted-foreground">
-                Explorez les decks créés par la communauté
+                {user
+                  ? "Continuez votre apprentissage"
+                  : "Explorez les decks créés par la communauté"}
               </p>
             </div>
-            <Link to="/decks">
-              <Button variant="outline" className="gap-2">
-                Voir tout
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3">
+              {user && sortedDecks.length > 0 && (
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) => setSortBy(value as SortOption)}
+                >
+                  <SelectTrigger className="w-48">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Trier par" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Plus récents</SelectItem>
+                    <SelectItem value="cards">Plus de cartes</SelectItem>
+                    <SelectItem value="progress">Progression</SelectItem>
+                    <SelectItem value="name">Nom (A-Z)</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+              <Link to="/decks">
+                <Button variant="outline" className="gap-2">
+                  Voir tout
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sampleDecks.map((deck) => (
+            {displayDecks.map((deck) => (
               <DeckCard
                 key={deck.id}
                 title={deck.title}
-                cardCount={deck.cardCount}
-                categoryCount={deck.categoryCount}
+                cardCount={deck.cardCount || 0}
+                categoryCount={deck.categoryCount || 0}
                 color={deck.color}
-                progress={deck.progress}
-                isShared={deck.isShared}
-                onPlay={() => console.log("Jouer", deck.id)}
-                onClick={() => console.log("Voir", deck.id)}
+                progress={deck.progress || 0}
+                isShared={"isShared" in deck ? deck.isShared : false}
+                onPlay={() =>
+                  user ? navigate(`/study/${deck.id}`) : navigate("/auth")
+                }
+                onClick={() =>
+                  user ? navigate(`/deck/${deck.id}`) : navigate("/auth")
+                }
               />
             ))}
           </div>

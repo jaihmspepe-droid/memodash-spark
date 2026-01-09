@@ -1,9 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Logo } from "./Logo";
 import { Button } from "./ui/button";
-import { Home, LayoutGrid, Settings, User, LogOut, Loader2 } from "lucide-react";
+import { Home, LayoutGrid, User, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { SettingsDialog } from "./SettingsDialog";
+import { StatsDisplay } from "./StatsDisplay";
 
 const navItems = [
   { path: "/", label: "Accueil", icon: Home },
@@ -49,7 +51,9 @@ export const Navbar = () => {
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           ) : user ? (
             <>
-              <span className="text-sm text-muted-foreground hidden sm:block">
+              <StatsDisplay />
+              <SettingsDialog />
+              <span className="text-sm text-muted-foreground hidden sm:block max-w-32 truncate">
                 {user.email}
               </span>
               <Button variant="ghost" size="icon" onClick={handleSignOut}>
@@ -57,12 +61,15 @@ export const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Link to="/auth">
-              <Button variant="hero" className="gap-2">
-                <User className="w-4 h-4" />
-                Connexion
-              </Button>
-            </Link>
+            <>
+              <SettingsDialog />
+              <Link to="/auth">
+                <Button variant="hero" className="gap-2">
+                  <User className="w-4 h-4" />
+                  Connexion
+                </Button>
+              </Link>
+            </>
           )}
         </div>
       </div>
