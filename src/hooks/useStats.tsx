@@ -29,9 +29,23 @@ export const useStats = () => {
         .from('study_sessions')
         .select('*')
         .eq('user_id', user.id)
-        .not('completed_at', 'is', null);
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching sessions:', error);
+        setStats({
+          totalSessions: 0,
+          totalCorrect: 0,
+          totalIncorrect: 0,
+          averageScore: 0,
+          winRate: 0,
+          currentStreak: 0,
+          maxStreak: 0,
+        });
+        setLoading(false);
+        return;
+      }
 
       if (!sessions || sessions.length === 0) {
         setStats({

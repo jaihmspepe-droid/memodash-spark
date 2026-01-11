@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ImportDeckDialog } from "@/components/ImportDeckDialog";
+import { EditDeckDialog } from "@/components/EditDeckDialog";
 
 const colorOptions = [
   "hsl(0 75% 50%)",
@@ -44,7 +45,7 @@ const Decks = () => {
   const [isCreating, setIsCreating] = useState(false);
   
   const navigate = useNavigate();
-  const { decks, loading, createDeck, fetchDecks } = useDecks();
+  const { decks, loading, createDeck, updateDeck, deleteDeck, fetchDecks } = useDecks();
   const { user, loading: authLoading } = useAuth();
 
   const filteredAndSortedDecks = useMemo(() => {
@@ -238,17 +239,25 @@ const Decks = () => {
         {filteredAndSortedDecks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAndSortedDecks.map((deck) => (
-              <DeckCard
-                key={deck.id}
-                title={deck.title}
-                cardCount={deck.cardCount || 0}
-                categoryCount={deck.categoryCount || 0}
-                color={deck.color}
-                progress={deck.progress || 0}
-                isShared={deck.share_permission !== 'none'}
-                onPlay={() => navigate(`/study/${deck.id}`)}
-                onClick={() => navigate(`/deck/${deck.id}`)}
-              />
+              <div key={deck.id} className="relative group">
+                <DeckCard
+                  title={deck.title}
+                  cardCount={deck.cardCount || 0}
+                  categoryCount={deck.categoryCount || 0}
+                  color={deck.color}
+                  progress={deck.progress || 0}
+                  isShared={deck.share_permission !== 'none'}
+                  onPlay={() => navigate(`/study/${deck.id}`)}
+                  onClick={() => navigate(`/deck/${deck.id}`)}
+                />
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <EditDeckDialog
+                    deck={deck}
+                    onUpdate={updateDeck}
+                    onDelete={deleteDeck}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         ) : decks.length === 0 ? (
