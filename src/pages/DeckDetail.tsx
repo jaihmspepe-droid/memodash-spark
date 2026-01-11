@@ -27,6 +27,7 @@ import {
   Loader2,
   Star,
   Folder,
+  Edit,
 } from "lucide-react";
 import { useFlashcards, useDecks } from "@/hooks/useDecks";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,12 +35,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryManager } from "@/components/CategoryManager";
 import { ShareDeckDialog } from "@/components/ShareDeckDialog";
+import { EditDeckDialog } from "@/components/EditDeckDialog";
 
 const DeckDetail = () => {
   const { deckId } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { decks, fetchDecks } = useDecks();
+  const { decks, fetchDecks, updateDeck, deleteDeck } = useDecks();
   const { flashcards, categories, loading, fetchFlashcards, createFlashcard } =
     useFlashcards(deckId);
   const { toast } = useToast();
@@ -58,6 +60,21 @@ const DeckDetail = () => {
     if (!selectedCategoryId) return flashcards;
     return flashcards.filter((card) => card.category_id === selectedCategoryId);
   }, [flashcards, selectedCategoryId]);
+
+  const cardCountByCategory = useMemo(() => {
+    const countMap = new Map<string, number>();
+    flashcards.forEach((card) => {
+      if (card.category_id) {
+        countMap.set(card.category_id, (countMap.get(card.category_id) || 0) + 1);
+      }
+    });
+    return countMap;
+  }, [flashcards]);
+
+  const handleDeleteDeck = async (id: string) => {
+    await deleteDeck(id);
+    navigate("/decks");
+  };
 
   const getCategoryName = (categoryId: string | null) => {
     if (!categoryId) return null;
@@ -164,9 +181,23 @@ const DeckDetail = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-display font-bold text-foreground">
-              {deck?.title || "Deck"}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-display font-bold text-foreground">
+                {deck?.title || "Deck"}
+              </h1>
+              {deck && (
+                <EditDeckDialog
+                  deck={deck}
+                  onUpdate={updateDeck}
+                  onDelete={handleDeleteDeck}
+                  trigger={
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  }
+                />
+              )}
+            </div>
             <p className="text-muted-foreground">
               {flashcards.length} carte{flashcards.length > 1 ? "s" : ""} •{" "}
               {categories.length} catégorie{categories.length > 1 ? "s" : ""}
@@ -202,6 +233,7 @@ const DeckDetail = () => {
                 onCategoriesChange={fetchFlashcards}
                 selectedCategoryId={selectedCategoryId}
                 onSelectCategory={setSelectedCategoryId}
+                cardCountByCategory={cardCountByCategory}
               />
             </div>
           </div>

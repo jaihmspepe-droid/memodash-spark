@@ -10,22 +10,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   FolderPlus,
   ChevronRight,
   ChevronDown,
   Trash2,
-  Edit,
   Loader2,
   Folder,
+  Play,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Category } from "@/hooks/useDecks";
+import { EditCategoryDialog } from "./EditCategoryDialog";
+import { useNavigate } from "react-router-dom";
 
 const colorOptions = [
   "hsl(0 75% 50%)",
@@ -42,6 +39,7 @@ interface CategoryManagerProps {
   onCategoriesChange: () => void;
   selectedCategoryId?: string | null;
   onSelectCategory: (categoryId: string | null) => void;
+  cardCountByCategory?: Map<string, number>;
 }
 
 export const CategoryManager = ({
@@ -50,6 +48,7 @@ export const CategoryManager = ({
   onCategoriesChange,
   selectedCategoryId,
   onSelectCategory,
+  cardCountByCategory,
 }: CategoryManagerProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -58,6 +57,7 @@ export const CategoryManager = ({
   const [isCreating, setIsCreating] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const rootCategories = categories.filter((c) => !c.parent_id);
 
@@ -151,11 +151,12 @@ export const CategoryManager = ({
     const hasSubcategories = subcategories.length > 0;
     const isExpanded = expandedCategories.has(category.id);
     const isSelected = selectedCategoryId === category.id;
+    const cardCount = cardCountByCategory?.get(category.id) || 0;
 
     return (
       <div key={category.id} className="space-y-1">
         <div
-          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
+          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors group/item ${
             isSelected
               ? "bg-primary/10 border border-primary/30"
               : "hover:bg-muted"
@@ -190,28 +191,45 @@ export const CategoryManager = ({
             {category.name}
           </span>
 
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {cardCount > 0 && (
+            <span className="text-xs text-muted-foreground">{cardCount}</span>
+          )}
+
+          <div className="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7"
+              className="h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/study/${deckId}?categoryId=${category.id}`);
+              }}
+              title="Étudier cette catégorie"
+            >
+              <Play className="w-3 h-3" />
+            </Button>
+            <EditCategoryDialog category={category} onUpdate={onCategoriesChange} />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
               onClick={(e) => {
                 e.stopPropagation();
                 openCreateSubcategory(category.id);
               }}
             >
-              <FolderPlus className="w-3.5 h-3.5" />
+              <FolderPlus className="w-3 h-3" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
+              className="h-6 w-6 text-destructive hover:text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
                 handleDeleteCategory(category.id);
               }}
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3 h-3" />
             </Button>
           </div>
         </div>

@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { FlashCard } from "@/components/FlashCard";
 import { ScoreDisplay } from "@/components/ScoreDisplay";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import { ArrowLeft, Check, X, RotateCcw, Trophy, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw, Trophy, Loader2, AlertCircle, Folder } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFlashcards } from "@/hooks/useDecks";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,8 +13,21 @@ import { supabase } from "@/integrations/supabase/client";
 const Study = () => {
   const { deckId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const categoryId = searchParams.get("categoryId");
   const { user } = useAuth();
-  const { flashcards, loading, updateSpacedRepetition } = useFlashcards(deckId);
+  const { flashcards: allFlashcards, categories, loading, updateSpacedRepetition } = useFlashcards(deckId);
+  
+  // Filter flashcards by category if categoryId is provided
+  const flashcards = useMemo(() => {
+    if (!categoryId) return allFlashcards;
+    return allFlashcards.filter(card => card.category_id === categoryId);
+  }, [allFlashcards, categoryId]);
+
+  const currentCategory = useMemo(() => {
+    if (!categoryId) return null;
+    return categories.find(c => c.id === categoryId);
+  }, [categories, categoryId]);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -136,13 +149,15 @@ const Study = () => {
               <AlertCircle className="w-10 h-10 text-muted-foreground" />
             </div>
             <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-              Aucune carte dans ce deck
+              {categoryId ? "Aucune carte dans cette catégorie" : "Aucune carte dans ce deck"}
             </h1>
             <p className="text-muted-foreground mb-6">
-              Ajoutez des flashcards à ce deck pour commencer à réviser
+              {categoryId
+                ? "Ajoutez des flashcards à cette catégorie pour commencer à réviser"
+                : "Ajoutez des flashcards à ce deck pour commencer à réviser"}
             </p>
-            <Button variant="hero" onClick={() => navigate("/decks")}>
-              Retour aux Decks
+            <Button variant="hero" onClick={() => navigate(`/deck/${deckId}`)}>
+              Ajouter des cartes
             </Button>
           </div>
         </main>
