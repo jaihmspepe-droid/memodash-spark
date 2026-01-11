@@ -36,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CategoryManager } from "@/components/CategoryManager";
 import { ShareDeckDialog } from "@/components/ShareDeckDialog";
 import { EditDeckDialog } from "@/components/EditDeckDialog";
+import { AIGenerateDialog } from "@/components/AIGenerateDialog";
 
 const DeckDetail = () => {
   const { deckId } = useParams();
@@ -240,114 +241,122 @@ const DeckDetail = () => {
 
           {/* Main content - Cards */}
           <div className="lg:col-span-3">
-            {/* Ajouter une carte */}
-            <Dialog
-              open={isCreateDialogOpen}
-              onOpenChange={setIsCreateDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 mb-6">
-                  <Plus className="w-5 h-5" />
-                  Ajouter une carte
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Nouvelle Flashcard</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="question">Question</Label>
-                    <Textarea
-                      id="question"
-                      placeholder="Écrivez votre question..."
-                      value={newQuestion}
-                      onChange={(e) => setNewQuestion(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="answer">Réponse</Label>
-                    <Textarea
-                      id="answer"
-                      placeholder="Écrivez la réponse..."
-                      value={newAnswer}
-                      onChange={(e) => setNewAnswer(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                  {categories.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>Catégorie</Label>
-                      <Select
-                        value={newCategoryId || "none"}
-                        onValueChange={(val) =>
-                          setNewCategoryId(val === "none" ? null : val)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Aucune catégorie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Aucune catégorie</SelectItem>
-                          {categories.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: cat.color }}
-                                />
-                                {cat.name}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label>Difficulté</Label>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((level) => (
-                        <button
-                          key={level}
-                          onClick={() => setNewDifficulty(level)}
-                          className="p-1"
-                        >
-                          <Star
-                            className={`w-6 h-6 ${
-                              level <= newDifficulty
-                                ? "text-yellow-500 fill-yellow-500"
-                                : "text-muted-foreground"
-                            }`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      1 = Facile, 5 = Très difficile
-                    </p>
-                  </div>
-                  <Button
-                    variant="hero"
-                    className="w-full"
-                    onClick={handleCreateCard}
-                    disabled={
-                      !newQuestion.trim() || !newAnswer.trim() || isCreating
-                    }
-                  >
-                    {isCreating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Création...
-                      </>
-                    ) : (
-                      "Créer la carte"
-                    )}
+            {/* Boutons d'action */}
+            <div className="flex gap-3 mb-6">
+              <AIGenerateDialog
+                deckId={deckId!}
+                categories={categories}
+                onCardsGenerated={fetchFlashcards}
+              />
+              {/* Ajouter une carte */}
+              <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={setIsCreateDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Plus className="w-5 h-5" />
+                    Ajouter une carte
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Nouvelle Flashcard</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="question">Question</Label>
+                      <Textarea
+                        id="question"
+                        placeholder="Écrivez votre question..."
+                        value={newQuestion}
+                        onChange={(e) => setNewQuestion(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="answer">Réponse</Label>
+                      <Textarea
+                        id="answer"
+                        placeholder="Écrivez la réponse..."
+                        value={newAnswer}
+                        onChange={(e) => setNewAnswer(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                    {categories.length > 0 && (
+                      <div className="space-y-2">
+                        <Label>Catégorie</Label>
+                        <Select
+                          value={newCategoryId || "none"}
+                          onValueChange={(val) =>
+                            setNewCategoryId(val === "none" ? null : val)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Aucune catégorie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Aucune catégorie</SelectItem>
+                            {categories.map((cat) => (
+                              <SelectItem key={cat.id} value={cat.id}>
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: cat.color }}
+                                  />
+                                  {cat.name}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label>Difficulté</Label>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((level) => (
+                          <button
+                            key={level}
+                            onClick={() => setNewDifficulty(level)}
+                            className="p-1"
+                          >
+                            <Star
+                              className={`w-6 h-6 ${
+                                level <= newDifficulty
+                                  ? "text-yellow-500 fill-yellow-500"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        1 = Facile, 5 = Très difficile
+                      </p>
+                    </div>
+                    <Button
+                      variant="hero"
+                      className="w-full"
+                      onClick={handleCreateCard}
+                      disabled={
+                        !newQuestion.trim() || !newAnswer.trim() || isCreating
+                      }
+                    >
+                      {isCreating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Création...
+                        </>
+                      ) : (
+                        "Créer la carte"
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
 
             {/* Liste des cartes */}
             {filteredFlashcards.length > 0 ? (
